@@ -9,17 +9,92 @@ permissions:
   contents: read
 
 jobs:
-  baseline:
+  secret-baseline:
+    name: Secret-file detection
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Unit test secret-file detection logic
+        shell: bash
+        run: bash .github/scripts/test-check-secret-files.sh
+
       - name: Check for secret-like files
         shell: bash
         run: |
           set -euo pipefail
-          if git ls-files | grep -E '(^|/)(\.env($|\.)|.*\.(pem|key|p12|p8)$|service-account\.json$|credentials\.json$)'; then
-            echo "Potential secret file detected in tracked files."
-            exit 1
+          git ls-files | bash .github/scripts/check-secret-files.sh
+
+  dependency-audit:
+    name: Dependency audit (0 critical)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Audit (fail on any vulnerability)
+        run: npm audit
+
+  backend:
+    name: Backend build / lint / typecheck / test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Build (contracts + api)
+        run: npm run build
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test
+
+  ios:
+    name: iOS boundary (skip if no Swift)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check Swift availability
+        id: swift
+        run: |
+          if command -v swift >/dev/null 2>&1; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Build + test iOS boundary (Swift)
+        if: steps.swift.outputs.available == 'true'
+        working-directory: apps/iOS
+        run: swift test
+
+      - name: Report iOS skip
+        if: steps.swift.outputs.available != 'true'
+        run: |
+          echo "::notice::Swift toolchain not available on this runner; iOS build/test skipped (reported, not faked). Full iOS validation runs on macOS runners / Xcode."

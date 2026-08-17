@@ -29,6 +29,21 @@ coverage/
 DerivedData/
 *.xcarchive
 *.ipa
+*.tsbuildinfo
+
+# TS emitted artifacts that should never live next to sources (defensive:
+# tsc must emit into dist/; if it ever leaks .js/.d.ts/.map into src/, ignore it).
+packages/*/src/**/*.js
+packages/*/src/**/*.js.map
+packages/*/src/**/*.d.ts
+packages/*/src/**/*.d.ts.map
+services/*/src/**/*.js
+services/*/src/**/*.js.map
+services/*/src/**/*.d.ts
+services/*/src/**/*.d.ts.map
+
+# Local dev runtime state (scripts/dev.sh)
+.dev/
 
 # IDE
 .vscode/settings.json

@@ -1,0 +1,32 @@
+{
+  "name": "unstuck",
+  "version": "0.0.0",
+  "private": true,
+  "description": "UNSTUCK — privacy-first relationship intelligence. Monorepo root (infrastructure only).",
+  "license": "UNLICENSED",
+  "workspaces": [
+    "packages/*",
+    "services/*"
+  ],
+  "scripts": {
+    "build:contracts": "npm --workspace @unstuck/contracts run build",
+    "build:api": "npm --workspace @unstuck/api run build",
+    "build": "npm run build:contracts && npm run build:api",
+    "typecheck:contracts": "npm --workspace @unstuck/contracts run typecheck",
+    "typecheck:api": "npm --workspace @unstuck/api run typecheck",
+    "typecheck": "npm run typecheck:contracts && npm run typecheck:api",
+    "lint:api": "npm --workspace @unstuck/api run lint",
+    "lint": "npm run lint:api",
+    "test:api": "npm --workspace @unstuck/api run test",
+    "test": "npm run test:api",
+    "dev": "bash scripts/dev.sh",
+    "dev:up": "bash scripts/dev.sh up",
+    "dev:down": "bash scripts/dev.sh down",
+    "dev:status": "bash scripts/dev.sh status",
+    "dev:test": "bash scripts/dev.sh test",
+    "dev:lint": "bash scripts/dev.sh lint"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
