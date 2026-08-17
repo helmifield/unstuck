@@ -24,7 +24,9 @@
     "dev:down": "bash scripts/dev.sh down",
     "dev:status": "bash scripts/dev.sh status",
     "dev:test": "bash scripts/dev.sh test",
-    "dev:lint": "bash scripts/dev.sh lint"
+    "dev:lint": "bash scripts/dev.sh lint",
+    "visual-preview": "node tools/visual-preview/server.js",
+    "visual-preview:test": "node tools/visual-preview/test.js"
   },
   "engines": {
     "node": ">=20"

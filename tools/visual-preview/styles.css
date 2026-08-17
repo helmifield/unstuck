@@ -1,0 +1,493 @@
+/*
+ * UNSTUCK — Visual QA preview styles.
+ *
+ * Visual-QA tool only. Reproduces the approved Phase 3A iOS UI for browser review.
+ * Tokens are transcribed EXACTLY from the iOS implementation (apps/iOS/Unstuck/Design/*)
+ * so there is ONE design system. Exact values remain OPEN per docs/design/DESIGN_DECISIONS.md;
+ * the centralized iOS placeholder values are reused here verbatim — no second system invented.
+ *
+ * Token sources:
+ *  - colors   → ColorTokens.swift  (RGB 0–1 → hex)
+ *  - spacing  → SpacingTokens.swift
+ *  - radius   → SpacingTokens.swift (UnstuckRadius)
+ *  - type     → TypeTokens.swift    (serif system hierarchy → serif stack + rem sizes)
+ *  - motion   → MotionTokens.swift  (timings reused; Reduce Motion honored)
+ */
+
+:root {
+  /* surface.base — warm ivory (OPEN placeholder, reused from iOS) */
+  --c-surface-base: #f9f7f2;
+  /* surface.elevated — quiet raised surface */
+  --c-surface-elevated: #fdfcf9;
+  /* text.primary — near-black */
+  --c-text-primary: #181614;
+  /* text.secondary — restrained neutral */
+  --c-text-secondary: #635f58;
+  /* text.tertiary — meta/captions */
+  --c-text-tertiary: #8e8980;
+  /* accent.primary — single restrained semantic accent */
+  --c-accent: #344456;
+  /* accent.muted — quiet accent for optional actions */
+  --c-accent-muted: #56646f;
+  /* border.subtle — hairline separators, used minimally */
+  --c-border-subtle: #ddd9d1;
+  /* action.primary fill + text */
+  --c-action-primary: #181614;
+  --c-action-primary-text: #f9f7f2;
+  /* action.disabled — must stay accessible */
+  --c-action-disabled: #bbb7b0;
+  /* Confidence state colors — labeled states, never color-only (paired with text) */
+  --c-confidence-high: #34564a;
+  --c-confidence-medium: #706038;
+  --c-confidence-low: #877763;
+  --c-evidence-insufficient: #70797d;
+
+  /* Spacing (SpacacingTokens.swift) */
+  --sp-zero: 0;
+  --sp-xs: 4px;
+  --sp-sm: 8px;
+  --sp-md: 16px;
+  --sp-lg: 24px;
+  --sp-xl: 36px;
+  --sp-x2l: 56px;
+  --sp-content-inset: 24px;
+
+  /* Radius (UnstuckRadius.swift) */
+  --r-none: 0;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-pill: 999px;
+
+  /* Motion (MotionTokens.swift) */
+  --m-reveal: 0.32s ease-out;
+  --m-transition: 0.28s ease-in-out;
+  --m-select: 0.18s ease-out;
+  --m-progress: 0.9s ease-in-out;
+  --m-ambient: 3.2s ease-in-out;
+
+  /* Typography — serif system hierarchy (TypeTokens.swift). Root 17px ≈ iOS .body. */
+  --font-serif: ui-serif, Georgia, "Times New Roman", "Iowan Old Style", "Apple Garamond", serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+
+  --t-hero: 700 2.0rem / 1.12 var(--font-serif);   /* largeTitle serif bold */
+  --t-section: 600 1.375rem / 1.2 var(--font-serif); /* title2 serif semibold */
+  --t-body: 400 1.0625rem / 1.5 var(--font-serif);   /* body serif */
+  --t-secondary: 400 0.94rem / 1.4 var(--font-sans); /* subheadline */
+  --t-micro: 400 0.75rem / 1.35 var(--font-sans);    /* caption */
+  --t-secondary-semibold: 600 0.94rem / 1.4 var(--font-sans);
+  --t-micro-medium: 500 0.75rem / 1.35 var(--font-sans);
+  --t-micro-semibold: 600 0.75rem / 1.35 var(--font-sans);
+}
+
+/* Reduce Motion: near-instant everywhere (mirrors UnstuckMotion.reduced). */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --m-reveal: 0.01s linear;
+    --m-transition: 0.01s linear;
+    --m-select: 0.01s linear;
+    --m-progress: 0.01s linear;
+    --m-ambient: 0.01s linear;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--c-surface-base);
+  color: var(--c-text-primary);
+  font-family: var(--font-serif);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* App shell — mobile-first, centered on larger screens. */
+#app {
+  width: 100%;
+  max-width: 430px;            /* phone width */
+  min-height: 100dvh;
+  margin: 0 auto;
+  background: var(--c-surface-base);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 600px) {
+  body { padding: 24px 0; }
+  #app {
+    min-height: calc(100dvh - 48px);
+    border-radius: var(--r-lg);
+    box-shadow: 0 10px 40px rgba(24, 22, 20, 0.10);
+    max-height: calc(100dvh - 48px);
+  }
+}
+
+/* Screen base — warm ivory, content-inset aware, generous whitespace. */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--c-surface-base);
+  animation: reveal var(--m-reveal);
+}
+.screen[hidden] { display: none; }
+
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Step progress (Progress.swift StepProgress). Shown for steps >= whatsGoingOn. */
+.step-progress {
+  display: flex;
+  gap: var(--sp-xs);
+  padding: var(--sp-md) var(--sp-content-inset) 0;
+  flex: 0 0 auto;
+}
+.step-progress .dot {
+  height: 4px;
+  background: var(--c-border-subtle);
+  border-radius: var(--r-pill);
+  width: 8px;
+  transition: width var(--m-select), background var(--m-select);
+}
+.step-progress .dot.filled { background: var(--c-accent); }
+.step-progress .dot.current { width: 24px; }
+
+/* Scroll content area. */
+.scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--sp-xl) var(--sp-content-inset) var(--sp-x2l);
+}
+.scroll:focus { outline: none; }
+
+/* Headings / text. */
+.h-hero {
+  font: var(--t-hero);
+  color: var(--c-text-primary);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.t-body {
+  font: var(--t-body);
+  color: var(--c-text-secondary);
+  margin: 0;
+}
+.t-secondary {
+  font: var(--t-secondary);
+  color: var(--c-text-secondary);
+  margin: 0;
+}
+.t-micro {
+  font: var(--t-micro);
+  color: var(--c-text-tertiary);
+  margin: 0;
+}
+.stack-lg > * + * { margin-top: var(--sp-lg); }
+.spacer { flex: 1 1 auto; min-height: var(--sp-xl); }
+.content-top { flex: 1 1 auto; }
+
+/* Privacy note (LaunchScreen PrivacyNote). */
+.privacy-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-sm);
+  color: var(--c-text-tertiary);
+  font: var(--t-micro);
+}
+.privacy-note svg { width: 13px; height: 13px; flex: 0 0 auto; margin-top: 1px; }
+
+/* Bottom action (BottomAction.swift) — pinned primary action. */
+.bottom-inset {
+  flex: 0 0 auto;
+  padding: 0 var(--sp-content-inset) var(--sp-md);
+  background: linear-gradient(to top, var(--c-surface-base) 70%, transparent);
+}
+.btn-primary {
+  width: 100%;
+  border: none;
+  border-radius: var(--r-md);
+  background: var(--c-action-primary);
+  color: var(--c-action-primary-text);
+  font: var(--t-secondary-semibold);
+  padding: var(--sp-lg) 0;
+  cursor: pointer;
+  transition: background var(--m-select), color var(--m-select), opacity var(--m-select);
+  min-height: 56px;
+}
+.btn-primary:hover { background: #2a2723; }
+.btn-primary:active { transform: scale(0.99); }
+.btn-primary[disabled] {
+  background: var(--c-action-disabled);
+  color: var(--c-text-tertiary);
+  cursor: not-allowed;
+}
+.btn-primary:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+.bottom-helper {
+  font: var(--t-micro);
+  color: var(--c-text-tertiary);
+  text-align: center;
+  margin-bottom: var(--sp-xs);
+}
+
+/* Situation picker (SituationPicker / SituationOption). */
+.situation-list { display: flex; flex-direction: column; gap: var(--sp-sm); margin-top: var(--sp-sm); }
+.situation-option {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-md);
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: var(--sp-lg) var(--sp-content-inset);
+  position: relative;
+  border-radius: 0;
+  font: var(--t-body);
+  color: var(--c-text-primary);
+  transition: background var(--m-select);
+}
+.situation-option .title { flex: 1 1 auto; }
+.situation-option .selected-label {
+  font: var(--t-micro);
+  color: var(--c-accent);
+  opacity: 0;
+  transition: opacity var(--m-select);
+}
+.situation-option.selected { background: var(--c-surface-elevated); }
+.situation-option.selected .selected-label { opacity: 1; }
+.situation-option::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0;
+  background: var(--c-accent);
+  transition: width var(--m-select);
+}
+.situation-option.selected::before { width: 3px; }
+.situation-option:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: -2px;
+}
+.situation-option:hover:not(.selected) { background: rgba(24, 22, 20, 0.025); }
+
+/* Tell input (TextInput TellTextInput). */
+.tell-input {
+  width: 100%;
+  min-height: 160px;
+  border: none;
+  border-radius: var(--r-md);
+  background: var(--c-surface-elevated);
+  color: var(--c-text-primary);
+  font: var(--t-body);
+  padding: var(--sp-md);
+  resize: vertical;
+  outline: none;
+}
+.tell-input::placeholder { color: var(--c-text-tertiary); }
+.tell-input:focus { box-shadow: 0 0 0 2px var(--c-border-subtle) inset; }
+
+/* Analysis progress (Progress AnalysisProgress) — honest, calm, breathing mark. */
+.loading-wrap {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-lg);
+}
+.breath {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--c-accent);
+  animation: breath var(--m-progress) ease-in-out infinite alternate;
+}
+@keyframes breath {
+  from { transform: scale(0.82); opacity: 0.55; }
+  to   { transform: scale(1.0);  opacity: 1; }
+}
+.loading-message {
+  font: var(--t-secondary);
+  color: var(--c-text-secondary);
+}
+
+/* Result sections (ResultSections / AnalysisResultView). LOCKED order. */
+.result { display: flex; flex-direction: column; gap: var(--sp-lg); }
+.section-header {
+  font: var(--t-section);
+  color: var(--c-text-primary);
+  margin-top: var(--sp-lg);
+  margin-bottom: var(--sp-sm);
+}
+.section-header:first-child { margin-top: 0; }
+.read {
+  font: var(--t-hero);
+  color: var(--c-text-primary);
+  letter-spacing: -0.01em;
+}
+.overall-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+}
+.overall-label { font: var(--t-micro); color: var(--c-text-tertiary); }
+
+/* Confidence indicator (ConfidenceIndicator) — labeled state, not a score. */
+.confidence {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-xs);
+  font: var(--t-micro-medium);
+  color: var(--c-text-secondary);
+}
+.confidence .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.confidence[data-level="high"]   .dot { background: var(--c-confidence-high); }
+.confidence[data-level="medium"] .dot { background: var(--c-confidence-medium); }
+.confidence[data-level="low"]    .dot { background: var(--c-confidence-low); }
+
+/* Signal item (SignalItem). */
+.signal { padding: var(--sp-md) 0; }
+.signal + .signal { border-top: 1px solid var(--c-border-subtle); }
+.signal-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-sm);
+}
+.signal-name {
+  font: var(--t-secondary-semibold);
+  color: var(--c-text-primary);
+}
+.signal-reading { font: var(--t-body); color: var(--c-text-primary); margin-top: var(--sp-sm); }
+.signal-evidence { font: var(--t-secondary); color: var(--c-text-secondary); margin-top: var(--sp-sm); }
+
+/* Why / DoesNotMean / NextMove text. */
+.why-text { font: var(--t-body); color: var(--c-text-primary); }
+.does-not-mean-list { display: flex; flex-direction: column; gap: var(--sp-xs); }
+.does-not-mean-list li { font: var(--t-body); color: var(--c-text-primary); list-style: none; }
+.next-move-text { font: var(--t-body); color: var(--c-text-primary); }
+
+/* Curiosity hook (CuriosityHookView) — optional, genuine. */
+.curiosity {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: var(--c-surface-elevated);
+  border-radius: var(--r-md);
+  padding: var(--sp-md);
+  cursor: pointer;
+  transition: background var(--m-select);
+}
+.curiosity:hover { background: #f4f1ea; }
+.curiosity .label { font: var(--t-micro-semibold); color: var(--c-accent); display: block; margin-bottom: var(--sp-xs); }
+.curiosity .hook { font: var(--t-body); color: var(--c-text-primary); }
+
+/* Failure state (ResultScreen failed). */
+.failed-title { font: var(--t-section); color: var(--c-text-primary); }
+.failed-msg { font: var(--t-body); color: var(--c-text-secondary); }
+
+/* Ambient illustration drift (onboarding only, very slow and gentle). */
+.ambient-mark {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.0;
+  animation: ambient var(--m-ambient) ease-in-out infinite alternate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ambient-mark svg { width: 120px; height: 120px; opacity: 0.08; }
+
+@keyframes ambient {
+  from { transform: translate(-6px, -4px) rotate(-0.6deg); }
+  to   { transform: translate(6px, 4px) rotate(0.6deg); }
+}
+
+/* Reveal stagger for result sections (calm unfurl). */
+.reveal-item { animation: reveal var(--m-reveal) both; }
+.reveal-item:nth-child(1) { animation-delay: 0.00s; }
+.reveal-item:nth-child(2) { animation-delay: 0.05s; }
+.reveal-item:nth-child(3) { animation-delay: 0.10s; }
+.reveal-item:nth-child(4) { animation-delay: 0.15s; }
+.reveal-item:nth-child(5) { animation-delay: 0.20s; }
+.reveal-item:nth-child(6) { animation-delay: 0.25s; }
+.reveal-item:nth-child(7) { animation-delay: 0.30s; }
+
+/* ---------------------------------------------------------------------------
+ * DEVELOPMENT-ONLY preview controls.
+ * Visually separated from the product UI, clearly marked, never shipped native.
+ * ------------------------------------------------------------------------- */
+.dev-panel {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  z-index: 50;
+  max-width: calc(100vw - 24px);
+  background: #11151b;
+  color: #e7ecf2;
+  border-radius: var(--r-md);
+  padding: 10px 12px 12px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  max-height: calc(100dvh - 24px);
+  overflow: auto;
+}
+.dev-panel__tag {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: #f0a93b;
+  color: #1a1206;
+  padding: 2px 6px;
+  border-radius: var(--r-sm);
+  margin-bottom: 8px;
+}
+.dev-panel__title { font-weight: 600; margin: 0 0 8px; color: #cfd6df; }
+.dev-panel__row { display: flex; flex-wrap: wrap; gap: 6px; }
+.dev-btn {
+  font: 500 12px/1 var(--font-sans);
+  color: #e7ecf2;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--r-sm);
+  padding: 7px 9px;
+  cursor: pointer;
+  transition: background var(--m-select);
+}
+.dev-btn:hover { background: rgba(255, 255, 255, 0.16); }
+.dev-btn[aria-pressed="true"] { background: var(--c-accent); border-color: var(--c-accent); }
+.dev-panel__sep { height: 1px; background: rgba(255,255,255,0.10); margin: 10px 0; }
+.dev-panel__hint { color: #8a93a0; font-size: 11px; line-height: 1.4; margin: 6px 0 0; }
+
+/* Reduce-motion forced (dev toggle) re-applies the same near-instant tokens. */
+body.force-reduced-motion {
+  --m-reveal: 0.01s linear;
+  --m-transition: 0.01s linear;
+  --m-select: 0.01s linear;
+  --m-progress: 0.01s linear;
+  --m-ambient: 0.01s linear;
+}
+body.force-reduced-motion .breath,
+body.force-reduced-motion .ambient-mark,
+body.force-reduced-motion .reveal-item,
+body.force-reduced-motion .screen { animation-duration: 0.01s !important; animation-iteration-count: 1 !important; }

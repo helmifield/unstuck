@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light" />
+  <meta name="referrer" content="no-referrer" />
+  <!-- Visual QA preview only: no analytics, no tracking, no external requests. -->
+  <title>UNSTUCK — Visual QA Preview (dev-only)</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!--
+    VISUAL-QA TOOL ONLY. Not the product. Reproduces the approved Phase 3A iOS UI
+    for browser review. No API calls, no secrets, no real user data, no AI provider.
+    Mock data is deterministic (see mock.js). Do not ship this in the native app.
+  -->
+  <main id="app" aria-label="UNSTUCK visual QA preview">
+
+    <!-- 1. LAUNCH -->
+    <section class="screen" id="screen-launch" role="region" aria-label="Launch">
+      <div class="ambient-mark" aria-hidden="true">
+        <!-- minimal hand-drawn-ish mark (no external assets) -->
+        <svg viewBox="0 0 100 100" fill="none" stroke="#181614" stroke-width="2" stroke-linecap="round">
+          <circle cx="50" cy="50" r="34" />
+          <path d="M50 28 V50 L64 58" />
+        </svg>
+      </div>
+      <div class="scroll">
+        <div class="stack-lg">
+          <h1 class="h-hero">Unstuck</h1>
+          <p class="t-body">A quiet read on what&rsquo;s actually going on.</p>
+          <div class="spacer"></div>
+          <div class="privacy-note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+            <span>Your conversation stays yours. Nothing is stored unless you choose to add it.</span>
+          </div>
+        </div>
+      </div>
+      <div class="bottom-inset">
+        <button class="btn-primary" data-action="begin">Start</button>
+      </div>
+    </section>
+
+    <!-- 2. WHAT'S GOING ON? -->
+    <section class="screen" id="screen-whatsGoingOn" hidden role="region" aria-label="What's going on">
+      <div class="step-progress" data-step-progress data-step="1"></div>
+      <div class="scroll">
+        <div class="stack-lg">
+          <h1 class="h-hero">What&rsquo;s going on?</h1>
+          <p class="t-body">Tell us where things are. We&rsquo;ll give you an honest read &mdash; not a verdict.</p>
+          <div class="spacer"></div>
+        </div>
+      </div>
+      <div class="bottom-inset">
+        <button class="btn-primary" data-action="continue">Continue</button>
+      </div>
+    </section>
+
+    <!-- 3. SELECT SITUATION -->
+    <section class="screen" id="screen-selectSituation" hidden role="region" aria-label="Select situation">
+      <div class="step-progress" data-step-progress data-step="2"></div>
+      <div class="scroll">
+        <div class="stack-lg">
+          <h1 class="h-hero">Pick one</h1>
+          <p class="t-secondary">Choose the situation that&rsquo;s closest. You can refine as you go.</p>
+          <div class="situation-list" id="situation-list"></div>
+        </div>
+      </div>
+      <div class="bottom-inset">
+        <div class="bottom-helper" id="situation-helper">Pick one to continue.</div>
+        <button class="btn-primary" data-action="continue" disabled>Continue</button>
+      </div>
+    </section>
+
+    <!-- 4. TELL US WHAT'S HAPPENING -->
+    <section class="screen" id="screen-tell" hidden role="region" aria-label="Tell us what's happening">
+      <div class="step-progress" data-step-progress data-step="3"></div>
+      <div class="scroll">
+        <div class="stack-lg">
+          <h1 class="h-hero">What&rsquo;s happening?</h1>
+          <p class="t-secondary">Describe it in your own words. A few sentences is plenty.</p>
+          <label class="tell-input-label" for="tell-input" style="position:absolute;left:-9999px;">Describe what&rsquo;s happening</label>
+          <textarea class="tell-input" id="tell-input" placeholder="We&rsquo;ve been talking for a few weeks&hellip;" aria-label="Describe what&rsquo;s happening"></textarea>
+          <p class="t-micro" id="tell-guidance" hidden></p>
+        </div>
+      </div>
+      <div class="bottom-inset">
+        <button class="btn-primary" data-action="get-read" disabled>Get my read</button>
+      </div>
+    </section>
+
+    <!-- 5. ANALYSIS TRANSITION -->
+    <section class="screen" id="screen-loading" hidden role="region" aria-label="Reading the situation" aria-live="polite">
+      <div class="step-progress" data-step-progress data-step="4"></div>
+      <div class="loading-wrap">
+        <div class="breath" aria-hidden="true"></div>
+        <div class="loading-message">Reading the situation&hellip;</div>
+      </div>
+    </section>
+
+    <!-- 6. THE READ (result) -->
+    <section class="screen" id="screen-result" hidden role="region" aria-label="Initial read">
+      <div class="step-progress" data-step-progress data-step="4"></div>
+      <div class="scroll">
+        <div class="result" id="result-container"></div>
+      </div>
+      <div class="bottom-inset" id="result-actions"></div>
+    </section>
+
+  </main>
+
+  <!-- DEVELOPMENT-ONLY preview controls (never in native app). -->
+  <aside class="dev-panel" id="dev-panel" aria-label="Development-only preview controls">
+    <span class="dev-panel__tag">Dev only</span>
+    <p class="dev-panel__title">Visual QA &mdash; jump to state</p>
+    <div class="dev-panel__row" id="dev-state-row">
+      <button class="dev-btn" data-jump="launch">Launch</button>
+      <button class="dev-btn" data-jump="whatsGoingOn">What&rsquo;s going on</button>
+      <button class="dev-btn" data-jump="selectSituation">Situation</button>
+      <button class="dev-btn" data-jump="tell">Tell</button>
+      <button class="dev-btn" data-jump="loading">Analysis</button>
+      <button class="dev-btn" data-jump="result">The Read</button>
+    </div>
+    <div class="dev-panel__sep"></div>
+    <div class="dev-panel__row">
+      <button class="dev-btn" data-jump="result-no-tell" title="Result with no Tell (low confidence)">The Read &mdash; no tell</button>
+      <button class="dev-btn" data-jump="failed">Failed state</button>
+    </div>
+    <div class="dev-panel__sep"></div>
+    <div class="dev-panel__row">
+      <button class="dev-btn" id="dev-reduced-motion" aria-pressed="false">Reduce motion</button>
+      <button class="dev-btn" data-jump="reset">Reset flow</button>
+    </div>
+    <p class="dev-panel__hint">Mock data only. No network. Mirrors the iOS Phase 3A UI.</p>
+  </aside>
+
+  <script src="mock.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
