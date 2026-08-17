@@ -29,8 +29,14 @@ expressed as a Swift Package so it can be type-checked where Swift is available
 (see `Package.swift` at the iOS root). SwiftUI View files live in the Xcode app target
 only. The full app target requires Xcode and the iOS SDK:
 
-1. Open `Unstuck.xcodeproj` in Xcode (create one from these sources if not present).
-2. Select a simulator and run.
+1. Open `Unstuck.xcworkspace` (or `Unstuck.xcodeproj`) in Xcode.
+2. Select the `Unstuck` scheme and an iOS Simulator.
+3. Run (⌘R). The app boots into `UnstuckApp` (`@main`) → `ContentView` → `FlowContainerView`.
+
+`swift test` (run from `apps/iOS/`) validates the `UnstuckBoundary` package wherever
+Swift is installed. The Xcode app target compiles the boundary sources inline (it does
+not link the package product, so there is no source duplication); the package remains
+the canonical boundary for `swift test`.
 
 If `swift`/`xcodebuild` is unavailable (e.g. CI on Linux), the iOS build/test is
 skipped and reported as such — it is never faked. Run the backend (`services/api`)

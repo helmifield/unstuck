@@ -11,7 +11,7 @@ struct ContentView: View {
     }
 
     private func makeViewModel() -> UnstuckFlowViewModel {
-        let client = URLSessionAPIClient(baseURL: environment.apiBaseURL)
+        let client = URLSessionAPIClient(environment: environment)
         let service = BackendAnalysisService(client: client)
         return UnstuckFlowViewModel(boundary: service)
     }
