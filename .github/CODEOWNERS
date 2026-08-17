@@ -1,0 +1,6 @@
+# Security-sensitive paths require repository owner review.
+* @helmifield
+
+# Security and infrastructure
+/docs/SECURITY.md @helmifield
+/.github/ @helmifield
