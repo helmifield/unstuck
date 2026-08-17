@@ -1,0 +1,49 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.p8
+*.mobileprovision
+service-account.json
+credentials.json
+secrets.*
+
+# macOS
+.DS_Store
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build output
+.next/
+dist/
+build/
+coverage/
+DerivedData/
+*.xcarchive
+*.ipa
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# Local tooling
+.venv/
+.python-version
+
+# Local databases / caches
+*.db
+*.sqlite
+*.sqlite3
+.cache/
+.tmp/
+
+# Logs
+*.log
